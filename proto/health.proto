@@ -2,6 +2,8 @@ syntax = "proto3";
 package health;
 option go_package = "github.com/parampatil/stealth-backend/proto";
 
+import "google/protobuf/timestamp.proto";
+
 message HealthCheckRequest {}
 
 message HealthCheckResponse {
@@ -16,7 +18,41 @@ message GreetingResponse {
     string message = 1;
 }
 
+message Earning {
+    string earning_id = 1;
+    double amount = 2;
+    google.protobuf.Timestamp date = 3;
+}
+
+message GetEarningsRequest {
+    string uid = 1;
+}
+
+message GetEarningsResponse {
+    repeated Earning earnings = 1;
+}
+
+message CreateEarningRequest {
+    string uid = 1;
+    Earning earning = 2;
+}
+
+message CreateEarningResponse {
+    string status = 1;
+}
+
+message GenerateDemoDataRequest {
+    string uid = 1;
+}
+
+message GenerateDemoDataResponse {
+    string status = 1;
+}
+
 service HealthService {
     rpc Check(HealthCheckRequest) returns (HealthCheckResponse) {}
     rpc Greet(GreetingRequest) returns (GreetingResponse) {}
+    rpc GetEarnings(GetEarningsRequest) returns (GetEarningsResponse) {}
+    rpc CreateEarning(CreateEarningRequest) returns (CreateEarningResponse) {}
+    rpc GenerateDemoData(GenerateDemoDataRequest) returns (GenerateDemoDataResponse) {}
 }
