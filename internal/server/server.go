@@ -18,3 +18,10 @@ func (s *HealthServer) Check(ctx context.Context, req *pb.HealthCheckRequest) (*
         Status: "SERVING",
     }, nil
 }
+
+func (s *HealthServer) Greet(ctx context.Context, req *pb.GreetingRequest) (*pb.GreetingResponse, error) {
+    message := "Hello, " + req.Name + "!"
+    return &pb.GreetingResponse{
+        Message: message,
+    }, nil
+}
