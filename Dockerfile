@@ -1,5 +1,5 @@
 # Use the official Golang image as the base image
-FROM golang:latest
+FROM golang:alpine
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
@@ -18,6 +18,9 @@ RUN go build -o main ./cmd
 
 # Expose port 50051 to the outside world
 EXPOSE 50051
+
+# Set environment variable for Google Cloud credentials
+ENV GOOGLE_APPLICATION_CREDENTIALS="/app/application_default_credentials.json"
 
 # Command to run the executable
 CMD ["./main"]
