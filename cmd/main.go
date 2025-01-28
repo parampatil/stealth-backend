@@ -11,6 +11,8 @@ import (
 	"google.golang.org/grpc"
 )
 
+// TODO: Implement the main function in goroutine
+// TODO: Write the project id in environment variable
 func main() {
     ctx := context.Background()
 
