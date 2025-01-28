@@ -14,9 +14,6 @@
 # Dependency directories
 vendor/
 
-# Generated proto files
-*.pb.go
-
 # IDE specific files
 .idea/
 .vscode/
