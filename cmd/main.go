@@ -1,38 +1,39 @@
 package main
 
 import (
-	"context"
-	"log"
-	"net"
-
-	"cloud.google.com/go/spanner"
-	"github.com/parampatil/stealth-backend/internal/server"
-	pb "github.com/parampatil/stealth-backend/proto"
-	"google.golang.org/grpc"
+    "context"
+    "log"
+    "os"
+    "os/signal"
+    "syscall"
+    "cloud.google.com/go/spanner"
+    "github.com/parampatil/stealth-backend/internal/server"
 )
 
-// TODO: Implement the main function in goroutine
-// TODO: Write the project id in environment variable
 func main() {
     ctx := context.Background()
 
+    // Spanner client Initialization
     spannerClient, err := spanner.NewClient(ctx, "projects/stealth-448823/instances/stealth-backend-db/databases/youtube_earnings")
     if err != nil {
         log.Fatalf("Failed to create Spanner client: %v", err)
     }
-    defer spannerClient.Close()
 
-    lis, err := net.Listen("tcp", ":8080")
-    if err != nil {
-        log.Fatalf("Failed to listen: %v", err)
-    }
+    // Server Initialization
+    srv := server.NewServer(spannerClient)
+    
+    // Handle graceful shutdown
+    sigChan := make(chan os.Signal, 1)
+    signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+    
+    // Start server in goroutine
+    go func() {
+        if err := srv.Start(":8080"); err != nil {
+            log.Fatalf("Failed to start server: %v", err)
+        }
+    }()
 
-    s := grpc.NewServer()
-    healthServer := server.NewHealthServer(spannerClient)
-    pb.RegisterHealthServiceServer(s, healthServer)
-
-    log.Printf("Server listening at %v", lis.Addr())
-    if err := s.Serve(lis); err != nil {
-        log.Fatalf("Failed to serve: %v", err)
-    }
+    <-sigChan
+    log.Println("Shutting down server...")
+    srv.Stop()
 }
